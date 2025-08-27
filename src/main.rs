@@ -1,9 +1,11 @@
 use reqwest::Client;
-use rand::Rng;
-use serde::Deserialize;
-use quick_js::{Context, JsValue};
 use std::process::Command;
 use rand::prelude::*;
+
+const NAME:&str = "lava chicken";   
+const PIN_CHECKS:u32 = 250;
+
+
 fn click_at(x: u32, y: u32) {
     // Move mouse
     Command::new("xdotool")
@@ -19,11 +21,6 @@ fn click_at(x: u32, y: u32) {
 }
 fn open_and_type(pin: u32, nickname: &str) {
     // Open kahoot.it in Firefox
-    Command::new("firefox")
-        .arg("--new-tab")
-        .arg("https://kahoot.it")
-        .spawn()
-        .expect("failed to open Firefox");
 
     // Sleep to wait for the page to load
     std::thread::sleep(std::time::Duration::from_secs(4));
@@ -54,58 +51,34 @@ fn open_and_type(pin: u32, nickname: &str) {
         .expect("failed to press Enter");
 }
 
-#[derive(Debug, Deserialize)]
-struct KahootSessionResponse {
-    challenge: Option<String>,
-    sessionToken: Option<String>,
-    status: Option<String>,
-    message: Option<String>,
-}
-
-fn solve_challenge(js_code: &str) -> Option<String> {
-    let context = Context::new().ok()?;
-    let result = context.eval(js_code).ok()?;
-    match result {
-        JsValue::String(s) => Some(s),
-        JsValue::Int(i) => Some(i.to_string()),
-        JsValue::Float(f) => Some(f.to_string()),
-        _ => None,
-    }
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut rng = rand::rng();
     let mut nums: Vec<u32> = (100_000..1_000_000).collect();
     nums.shuffle(&mut rng);
-    for i in 0..250{
-        let client = Client::new();
-        let name = "lava chicken";
-        let pin: u32 = nums[i];
-        let url = format!("https://kahoot.it/reserve/session/{}", pin);
+    // only run this once 
+    Command::new("firefox")
+        .arg("--new-tab")
+        .arg("https://kahoot.it")
+        .spawn()
+        .expect("failed to open Firefox");
+    
+    let client = Client::new();
 
+    for i in 0..PIN_CHECKS{
+        
+        let pin: u32 = nums[i as usize];
+        let url = format!("https://kahoot.it/reserve/session/{}", pin);
         let res = client.get(&url).send().await?;
 
         if res.status().is_success() {
-            let body: KahootSessionResponse = res.json().await?;
-            println!("!!! PIN FOUND : {pin} !!!");
-            if let Some(challenge_js) = &body.challenge {
-                println!("✅ Challenge received.");
-                open_and_type(pin, &name);
-               // if let Some(response_token) = solve_challenge(challenge_js) {
-               //     println!("🎉 Solved challenge: {}", response_token);
-               //     println!("Now you can try to join the game with sessionToken + challenge response.");
-               // } else {
-               //     println!("💀 Failed to solve the challenge.");
-               // }
-            } else if let Some(msg) = &body.message {
-                println!("⚠️ Cannot join game: {}", msg);
-            } else {
-                println!("❌ Unknown response. Game may not be joinable.");
-            }
+            println!("!!! PIN FOUND : {pin} !!! {i}/{PIN_CHECKS}");
+            open_and_type(pin, NAME);
         } else {
-            println!("❌ PIN {} is not valid.", pin);
+            println!("❌ PIN {pin} is not valid. {i}/{PIN_CHECKS}");
         }
     }
+    // random return value (needed)
     Ok(())
 }
