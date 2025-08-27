@@ -39,6 +39,8 @@ def checkIfElementExists(divclass):
     if isElementReturned == 0:
         return False
 
+setVarsFromArgs()
+
 for i in range(PIN_COUNT):
     game_pin = random.randint(100_000, 1_000_000)
     response = requests.get(f"https://kahoot.it/reserve/session/{game_pin}")
