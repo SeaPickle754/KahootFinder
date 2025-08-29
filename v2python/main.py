@@ -14,7 +14,9 @@ game_pin = 123456
 NICKNAME = "lavachicken"
 # you guessed it
 PIN_COUNT = 50
-
+foundGamesCount = 0
+random.seed(time.time())
+print(f"Using random seed {time.time()}")
 def setVarsFromArgs():
     global NICKNAME
     global PIN_COUNT
@@ -59,6 +61,7 @@ for i in range(PIN_COUNT):
     if response.status_code == 200:
         print(f"GAME PIN FOUND: PIN {game_pin} IS VALID!!!!! {i}/{PIN_COUNT}")
         time.sleep(0.5)
+        foundGamesCount += 1
         # this enters game pin automatically
         
         while(1):
@@ -87,24 +90,25 @@ for i in range(PIN_COUNT):
         # if the error bar pops up keep going
         if not checkIfElementExists("notification-bar__Text-sc-1e4wbj0-1 jkdbXz"):
             
+            print("No luck, game is dead.")
+            continue
+        # no error bar?
+        else:
+            print("No notification bar, game is possibly alive?")
+            print("Standby for loading time buffer...")
+            time.sleep(2)
+            print("checking if in game...")
             if driver.title == "You're In!" or driver.title == "Kahoot!":
                 print(f"Congrats! Pin {game_pin} worked!")
                 # iykyk
                 print("So long and thanks for all the fish. Quitting.")
                 quit()
-            print("No luck, game is dead.")
-            continue
-        else:
-            if driver.title == "You're In!":
-                print(f"Congrats! Pin {game_pin} worked!")
-                # iykyk
-                print("So long and thanks for all the fish. Quitting.")
-                options.headless = False
-                quit()
+            print("Game doesnt actually work. ")
 
     else:
         print(f"pin {game_pin} is not valid. {i}/{PIN_COUNT}")
 
 print("No games found. Quitting.")
+print(f"Valid Games: {foundGamesCount}/{PIN_COUNT} checked. thats a {round((foundGamesCount/PIN_COUNT)*100, 2)}% sucess rate!")
 driver.quit()
 quit()
