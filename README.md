@@ -2,7 +2,7 @@
 Bot to find Kahoot Games. Because Kahoot has a public API, it is easy to check random pins until you find an active one.
 Python is preferred, it is much improved over the rust one. 
 # WARNING: USE ONLY FOR EDUCATIONAL PURPOSES. TEST ONLY IN AN CONTROLLED ENVIRONMENT. I AM NOT RESPONSIBLE FOR WHAT YOU DO WITH THIS SCRIPT. 
-# USING IT IN A NON EDUCATIONAL MANNER MAY VIOLATE KAHOOTS' EULA. DO NOT ABUSE THIS PLEASE! I RELEASE MYSELF FROM ALL RESPONSIBILITY REGARDING OTHER PEOPLE'S USAGE OF THIS SCRIPT!!!!!!
+USING IT IN A NON EDUCATIONAL MANNER MAY VIOLATE KAHOOTS' EULA. DO NOT ABUSE THIS PLEASE! I RELEASE MYSELF FROM ALL RESPONSIBILITY REGARDING OTHER PEOPLE'S USAGE OF THIS SCRIPT!!!!!!
 Python environment:
 
 - First Time: Run `setup.sh`. If it gives you a permission denied error, run `sudo chmod 777 setup.sh` to make it executable.
